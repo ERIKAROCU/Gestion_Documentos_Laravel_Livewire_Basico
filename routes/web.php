@@ -21,6 +21,10 @@ use App\Livewire\Documents\DocumentTable;
 Route::get('/documentos', DocumentTable::class)->name('documents.index');
 
 //
+use App\Livewire\Documents\DocumentShow;
+Route::get('/documentos/ver/{id}', DocumentShow::class)->name('documents.show');
+
+//
 use App\Livewire\Documents\EditDocument;
 Route::get('/documentos/editar/{id}', EditDocument::class)->name('documents.edit');
 

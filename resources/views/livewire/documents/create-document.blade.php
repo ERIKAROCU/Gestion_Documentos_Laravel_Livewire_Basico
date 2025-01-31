@@ -1,45 +1,99 @@
 <div>
     <!-- Botón para abrir el modal -->
-    <button wire:click="openModal" class="bg-green-500 text-white px-4 py-2 rounded-md">Nuevo Documento</button>
+    <button wire:click="openModal" class="bg-green-500 text-white px-4 py-2 rounded-md transition-transform transform hover:scale-105 hover:bg-green-600 duration-300">
+        Nuevo Documento
+    </button>
 
     <!-- Modal -->
     @if($isOpen)
         <div class="fixed inset-0 flex justify-center items-center z-50 bg-gray-500 bg-opacity-50">
-            <div class="bg-white p-8 rounded-lg shadow-lg w-96">
-                <form wire:submit.prevent="save">
-                    <div>
-                        <input type="text" wire:model="numero_documento" placeholder="Número de Documento" class="w-full p-2 border rounded-md">
-                        @error('numero_documento') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            <div class="bg-white p-6 rounded-lg shadow-lg w-1/2 sm:w-86 transform transition-all duration-500">
+                <h2 class="text-center text-2xl font-semibold text-gray-700 mb-4">Nuevo Documento</h2>
+                <form wire:submit.prevent="save" class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="numero_documento" class="block text-sm font-medium text-gray-700">Número de Documento</label>
+                            <input
+                                type="text"
+                                wire:model="numero_documento"
+                                id="numero_documento"
+                                placeholder="Número de Documento"
+                                class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                            >
+                            @error('numero_documento') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="fecha_ingreso" class="block text-sm font-medium text-gray-700">Fecha de Ingreso</label>
+                            <input
+                                type="date"
+                                wire:model="fecha_ingreso"
+                                id="fecha_ingreso"
+                                class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                            >
+                            @error('fecha_ingreso') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                        </div>
                     </div>
 
-                    <div class="mt-4">
-                        <input type="date" wire:model="fecha_ingreso" class="w-full p-2 border rounded-md">
-                        @error('fecha_ingreso') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="origen_oficina" class="block text-sm font-medium text-gray-700">Oficina de Origen</label>
+                            <input
+                                type="text"
+                                wire:model="origen_oficina"
+                                id="origen_oficina"
+                                placeholder="Oficina de Origen"
+                                class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                            >
+                            @error('origen_oficina') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="titulo" class="block text-sm font-medium text-gray-700">Título</label>
+                            <input
+                                type="text"
+                                wire:model="titulo"
+                                id="titulo"
+                                placeholder="Título"
+                                class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                            >
+                            @error('titulo') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                        </div>
                     </div>
 
-                    <div class="mt-4">
-                        <input type="text" wire:model="origen_oficina" placeholder="Oficina de Origen" class="w-full p-2 border rounded-md">
-                        @error('origen_oficina') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="numero_folios" class="block text-sm font-medium text-gray-700">Número de Folios</label>
+                            <input
+                                type="number"
+                                wire:model="numero_folios"
+                                id="numero_folios"
+                                placeholder="Número de Folios"
+                                class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                            >
+                            @error('numero_folios') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="detalles" class="block text-sm font-medium text-gray-700">Detalles</label>
+                            <textarea
+                                wire:model="detalles"
+                                id="detalles"
+                                placeholder="Detalles"
+                                rows="3"
+                                class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
+                            ></textarea>
+                            @error('detalles') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                        </div>
                     </div>
 
-                    <div class="mt-4">
-                        <input type="text" wire:model="titulo" placeholder="Título" class="w-full p-2 border rounded-md">
-                        @error('titulo') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div class="mt-4">
-                        <input type="number" wire:model="numero_folios" placeholder="Número de Folios" class="w-full p-2 border rounded-md">
-                        @error('numero_folios') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div class="mt-4">
-                        <textarea wire:model="detalles" placeholder="Detalles" class="w-full p-2 border rounded-md"></textarea>
-                        @error('detalles') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                    </div>
-
-                    <footer class="mt-6 flex justify-between">
-                        <button type="button" wire:click="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded-md">Cancelar</button>
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Guardar</button>
+                    <footer class="mt-6 flex justify-between space-x-4">
+                        <button type="button" wire:click="closeModal" class="bg-gray-500 text-white px-4 py-2 rounded-md transition-transform transform hover:scale-105 hover:bg-gray-600 duration-300">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md transition-transform transform hover:scale-105 hover:bg-blue-600 duration-300">
+                            Guardar
+                        </button>
                     </footer>
                 </form>
             </div>

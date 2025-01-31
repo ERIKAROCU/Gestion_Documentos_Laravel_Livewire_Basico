@@ -118,7 +118,7 @@ class UploadFileDerivation extends Component
         return redirect()->route('documents.index');
     }
 
-    public function cancel()
+    public function closeModal()
     {
         return redirect(route('documents.index')); // Esto redirige a la página anterior
     }

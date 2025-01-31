@@ -8,17 +8,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 
-use function Livewire\Volt\protect;
-
 class EditDocument extends Component
 {
     public $document;
     public $numero_documento, $fecha_ingreso, $origen_oficina, $titulo, $numero_folios, $detalles;
 
+    public $documentId;
 
-    public function mount($id)
+    public function mount($documentId)
     {
-        $this->document = Document::findOrFail($id);
+        $this->document = Document::findOrFail($documentId);
         $this->numero_documento = $this->document->numero_documento;
         $this->fecha_ingreso = Carbon::parse($this->document->fecha_ingreso)->format('Y-m-d');
         $this->origen_oficina = $this->document->origen_oficina;
@@ -72,7 +71,7 @@ class EditDocument extends Component
         $this->redirect(route('documents.index'));
     }
 
-    public function cancel()
+    public function closeModal()
     {
         return redirect(route('documents.index')); // Esto redirige a la página anterior
     }
