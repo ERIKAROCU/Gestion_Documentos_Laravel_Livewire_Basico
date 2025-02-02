@@ -1,4 +1,13 @@
 <div class="container mx-auto p-4 bg-gray-50 rounded-lg shadow-md">
+    
+    <!-- Botón para crear usuario -->
+    <button
+        wire:click="openCreateModal"
+        class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 mb-4"
+    >
+        Crear Usuario
+    </button>
+
     <!-- Barra de búsqueda y filtros -->
     <div class="mb-4 flex justify-between items-center">
         <input
@@ -7,23 +16,25 @@
             placeholder="Buscar por nombre, correo, DNI o cargo..."
             class="w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
+
+        <select
+            wire:model.live="isActive"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+            <option value="">Todos</option>
+            <option value="1">Activos</option>
+            <option value="0">Inactivos</option>
+        </select>
+
         <select
             wire:model.live="perPage"
-            class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="px-6 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
             <option value="10">10 por página</option>
             <option value="25">25 por página</option>
             <option value="50">50 por página</option>
         </select>
     </div>
-
-    <!-- Botón para crear usuario -->
-    <button
-        wire:click="openCreateModal"
-        class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 mb-4"
-    >
-        Crear Usuario
-    </button>
 
     <!-- Tabla de usuarios -->
     <table class="min-w-full bg-white border border-gray-300 shadow-sm rounded-lg">

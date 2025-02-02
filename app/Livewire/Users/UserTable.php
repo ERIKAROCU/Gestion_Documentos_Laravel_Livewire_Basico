@@ -12,7 +12,7 @@ class UserTable extends Component
 
     public $search = ''; // Búsqueda general
     public $perPage = 10; // Número de usuarios por página
-
+    public $isActive = ''; // Estado del filtro de activos/inactivos
     public $showCreateModal = false; // Modal para crear usuario
     public $showEditModal = false; // Modal para editar usuario
     public $showViewModal = false; // Modal para ver usuario
@@ -21,6 +21,7 @@ class UserTable extends Component
     protected $queryString = [
         'search' => ['except' => ''],
         'perPage' => ['except' => 10],
+        'isActive' => ['except' => ''],
     ];
 
     public function openCreateModal()
@@ -56,6 +57,9 @@ class UserTable extends Component
                       ->orWhere('email', 'like', '%' . $this->search . '%')
                       ->orWhere('dni', 'like', '%' . $this->search . '%')
                       ->orWhere('cargo', 'like', '%' . $this->search . '%');
+            })
+            ->when($this->isActive !== '', function ($query) {
+                $query->where('is_active', $this->isActive);
             })
             ->orderBy('name', 'asc')
             ->paginate($this->perPage);

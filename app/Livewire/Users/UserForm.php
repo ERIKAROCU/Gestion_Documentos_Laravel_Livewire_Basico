@@ -101,5 +101,10 @@ class UserForm extends Component
     {
         return view('livewire.users.user-form');
     }
+
+    public function closeModal()
+    {
+        return redirect(route('users.index'));
+    }
     
 }

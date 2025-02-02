@@ -1,4 +1,5 @@
 <div class="container mx-auto p-4 bg-white rounded-lg shadow-md">
+    
     <form wire:submit.prevent="save" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Nombre -->
         <div>
@@ -69,12 +70,11 @@
                 class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2">
         </div>
     
-        <!-- Botones de acción -->
         <footer class="col-span-2 flex justify-end space-x-4">
             <button type="button" wire:click="closeModal"
-    class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-    Cancelar
-</button>
+                class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Cancelar
+            </button>
             <button type="submit"
                 class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 {{ $isEditing ? 'Actualizar' : 'Crear' }}
