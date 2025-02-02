@@ -39,4 +39,16 @@ Route::get('/archivos/descargar/{id}', [FileController::class, 'download'])->nam
 Route::get('/archivos/subir/{id}', UploadFileDerivation::class)->name('files.upload');
 
 
+
+
+
+
+
+
+
+use App\Livewire\Users\UserTable;
+Route::get('/usuarios', UserTable::class)->name('users.index');
+
+
+
 require __DIR__.'/auth.php';

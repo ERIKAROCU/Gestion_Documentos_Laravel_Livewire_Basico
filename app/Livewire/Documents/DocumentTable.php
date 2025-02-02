@@ -11,6 +11,7 @@ class DocumentTable extends Component
     use WithPagination;
 
     public $search = ''; // Búsqueda general
+    public $perPage = 10; // Número de documentos por página
 
     public $showEditModal = false; // Modal de edición
     public $showEmitModal = false; // Modal de emisión
@@ -18,6 +19,11 @@ class DocumentTable extends Component
     public $documentId; // ID del documento a editar
     public $documentoId; // ID del documento a emitir
     public $document;
+
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'perPage' => ['except' => 10],
+    ];
 
     // Abrir modal de edición
     public function editDocument($id)
@@ -69,7 +75,7 @@ class DocumentTable extends Component
     {
         // Búsqueda general (número de documento, título, etc.)
         $documents = Document::query()
-            ->when($this->search, function($query) {
+            ->when($this->search, function ($query) {
                 $query->where('numero_documento', 'like', '%' . $this->search . '%')
                     ->orWhere('titulo', 'like', '%' . $this->search . '%')
                     ->orWhere('fecha_ingreso', 'like', '%' . $this->search . '%')
@@ -77,18 +83,11 @@ class DocumentTable extends Component
                     ->orWhere('origen_oficina', 'like', '%' . $this->search . '%')
                     ->orWhere('derivado_oficina', 'like', '%' . $this->search . '%');
             })
-            ->orderby('numero_documento', 'desc')
-            ->paginate(10);
+            ->orderBy('numero_documento', 'desc')
+            ->paginate($this->perPage);
 
         return view('livewire.documents.document-table', [
             'documents' => $documents,
-            'search' => $this->search, // Pasar la búsqueda a la vista
         ])->layout('layouts.app');
     }
-
-
-        public function clearFilters()
-        {
-            $this->search = '';
-        }
-    }
+}

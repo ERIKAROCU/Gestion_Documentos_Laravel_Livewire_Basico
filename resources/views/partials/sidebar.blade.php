@@ -8,13 +8,13 @@
             <li><a href="{{ route('documents.index') }}" class="block p-4 hover:bg-gray-200">Documentos</a></li>
             
             <!-- Mostrar solo si el usuario es admin -->
-            @if(Auth::check() && Auth::user()->role === 'admin')
+            {{-- @if(Auth::check() && Auth::user()->role === 'admin') --}}
                 <li><a href="{{ route('users.index') }}" class="block p-4 hover:bg-gray-200">Usuarios</a></li>
-            @endif
+            {{-- @endif --}}
 
             <!-- Mostrar solo si el usuario es admin -->
             @if(Auth::check() && Auth::user()->role === 'admin')
-                <li><a href="{{ route('ad.index') }}" class="block p-4 hover:bg-gray-200">Admin Documentos</a></li>
+                <li><a href="{{ route('documents.index') }}" class="block p-4 hover:bg-gray-200">Admin Documentos</a></li>
             @endif
         </ul>
     </nav>
