@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Document;
 use App\Models\File;
+use App\Models\Oficina;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
@@ -18,6 +19,7 @@ class UploadFileDerivation extends Component
     public $derivado_oficina;
     public $fecha_salida;
     public $titulo;
+    public $oficinas = [];
 
     protected $rules = [
         'archivo' => 'required|file|mimes:pdf,doc,docx,xlsx|max:10240', // 10 MB máximo
@@ -36,6 +38,23 @@ class UploadFileDerivation extends Component
         'fecha_salida.date' => 'La fecha de salida debe ser una fecha válida.',
         'titulo.required' => 'El título es obligatorio.',
     ];
+
+    // Calcular días hábiles
+    private function calcularDiasHabiles($fechaEntrada)
+    {
+        $fechaActual = Carbon::now();
+        $diasHabiles = 0;
+
+        // Iterar sobre los días entre la fecha de entrada y la fecha actual
+        for ($date = Carbon::parse($fechaEntrada); $date->lte($fechaActual); $date->addDay()) {
+            // Verificar si es un día hábil (lunes a viernes)
+            if ($date->isWeekday()) {
+                $diasHabiles++;
+            }
+        }
+
+        return $diasHabiles;
+    }
 
     public function mount($documentoId = null)
     {
@@ -59,6 +78,8 @@ class UploadFileDerivation extends Component
 
         // Resetea el archivo si es necesario
         $this->reset(['archivo']);
+
+        $this->oficinas = Oficina::all();
     }
 
     public function save()
@@ -71,9 +92,6 @@ class UploadFileDerivation extends Component
             return;
         }
     
-        // Depuración: Verificar si el archivo se está recibiendo
-        logger('Archivo recibido:', ['archivo' => $this->archivo]);
-    
         // Buscar el documento
         $documento = Document::find($this->documento_id);
     
@@ -83,9 +101,24 @@ class UploadFileDerivation extends Component
             return;
         }
     
+        // Calcular los días hábiles entre la fecha de salida y la fecha actual
+        $diasHabiles = $this->calcularDiasHabiles($this->fecha_salida, Carbon::now());
+
+        // Si los días hábiles superan el límite (por ejemplo, 5 días)
+        if ($diasHabiles > 5) {
+            $documento->update([
+                'estado' => 'Vencido', // Cambiar el estado a vencido
+            ]);
+        } else {
+            // Si no se ha vencido, el estado se mantiene como emitido
+            $documento->update([
+                'estado' => 'Emitido', // El estado se mantiene como 'Emitido'
+            ]);
+        }
+
         // Guardar el archivo
         $rutaArchivo = $this->archivo->store('uploads', 'public');
-    
+
         // Actualizar el documento
         $documento->update([
             'derivado_oficina' => $this->derivado_oficina,

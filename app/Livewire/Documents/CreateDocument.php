@@ -4,12 +4,14 @@ namespace App\Livewire\Documents;
 
 use Livewire\Component;
 use App\Models\Document;
+use App\Models\Oficina;
 use Illuminate\Validation\Rule;
 
 class CreateDocument extends Component
 {
     public $isOpen = false;
     public $numero_documento, $fecha_ingreso, $origen_oficina, $titulo, $numero_folios, $detalles;
+    public $oficinas = [];
 
     protected $rules = [
         'numero_documento' => 'required|unique:documents',
@@ -32,9 +34,15 @@ class CreateDocument extends Component
         'detalles.required' => 'Los detalles son obligatorios.',
     ];
 
+    public function mount()
+    {
+        $this->oficinas = Oficina::all();
+    }
+
     public function openModal()
     {
         $this->reset();
+        $this->oficinas = Oficina::all();
         $this->isOpen = true;
     }
 
@@ -55,17 +63,13 @@ class CreateDocument extends Component
             'numero_folios' => $this->numero_folios,
             'detalles' => $this->detalles,
             'trabajador_id' => auth()->id(),
+            'estado' => 'recibido',
         ]);
 
         session()->flash('message', 'Documento registrado correctamente.');
         $this->reset();
         $this->closeModal();
         return redirect()->route('documents.index');
-    }
-
-    public function cancel()
-    {
-        return redirect(route('documents.index')); // Esto redirige a la página anterior
     }
 
     public function render()

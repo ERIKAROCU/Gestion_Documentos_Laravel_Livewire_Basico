@@ -19,14 +19,17 @@
         <!-- Oficina de destino -->
         <div>
             <label for="derivado_oficina" class="block text-sm font-medium text-gray-700">Oficina de destino</label>
-            <input
-                type="text"
+            <select
                 wire:model="derivado_oficina"
                 id="derivado_oficina"
-                placeholder="Oficina de destino"
                 class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
             >
-            @error('derivado_oficina') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
+                <option value="">Seleccione una oficina</option>
+                @foreach($oficinas as $oficina)
+                    <option value="{{ $oficina->nombre_oficina }}">{{ $oficina->nombre_oficina }}</option>
+                @endforeach
+            </select>
+            @error('derivado_oficina') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
         </div>
 
         <!-- Fecha de salida -->

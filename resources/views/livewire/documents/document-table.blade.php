@@ -1,26 +1,90 @@
 <div class="container mx-auto p-4 bg-gray-50 rounded-lg shadow-md">
-
     @livewire('documents.create-document')
-
     <br>
-
     <!-- Barra de búsqueda y filtros -->
-    <div class="mb-4 flex justify-between items-center">
-        <input
-            type="text"
-            wire:model.live="search"
-            placeholder="Buscar por número documento, fecha, título, oficina..."
-            class="w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-        <select
-            wire:model.live="perPage" 
-            class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-            <option value="10">10 por página</option>
-            <option value="25">25 por página</option>
-            <option value="50">50 por página</option>
-        </select>
+    <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Filtro por fecha -->
+        <div>
+            <input
+                type="date"
+                wire:model.live="searchDate"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Filtrar por fecha"
+            >
+        </div>
+
+        <!-- Filtro por oficina de origen -->
+        <div>
+            <select
+                wire:model.live="searchOrigenOficina"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+                <option value="">Oficina de origen (Todo)</option>
+                @foreach($oficinas as $oficina)
+                    <option value="{{ $oficina->nombre_oficina }}">{{ $oficina->nombre_oficina }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <!-- Filtro por oficina derivada -->
+        <div>
+            <select
+                wire:model.live="searchDerivadoOficina"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+                <option value="">Oficina derivada (Todo)</option>
+                @foreach($oficinas as $oficina)
+                    <option value="{{ $oficina->nombre_oficina }}">{{ $oficina->nombre_oficina }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <!-- Número de documentos por página -->
+        <div class="sm:col-span-2 lg:col-span-1">
+            <select
+                wire:model.live="perPage"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+                <option value="10">10 por página</option>
+                <option value="25">25 por página</option>
+                <option value="50">50 por página</option>
+            </select>
+        </div>
+
+        <!-- Búsqueda general -->
+        <div class="lg:col-span-2">
+            <input
+                type="text"
+                wire:model.live="search"
+                placeholder="Buscar por número documento, título..."
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+        </div>
+
+        <!-- Busqueda por estado -->
+        <div class="sm:col-span-2 lg:col-span-1">
+            <select
+                wire:model.live="searchEstado"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+                <option value="">Todo</option>
+                <option value="recibido">Recibidos</option>
+                <option value="emitido">Emitidos</option>
+                <option value="vencido">Vencidos</option>
+            </select>
+        </div>
+
+        <div>
+            <button
+                wire:click="resetFilters"
+                class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+            >
+                Resetear Filtros
+            </button>
+        </div>
     </div>
+    
+    
 
     <!-- Tabla de documentos -->
     <table class="min-w-full bg-white border border-gray-300 shadow-sm rounded-lg">
@@ -33,6 +97,7 @@
                 <th class="py-2 px-2 border-b text-left text-sm font-medium text-gray-600 w-10">Folios</th>
                 <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Derivado Oficina</th>
                 <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Fecha de Salida</th>
+                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Estado</th>
                 <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Tiempo Restante</th>
                 <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Acciones</th>
             </tr>
@@ -42,7 +107,7 @@
                 <tr>
                     <td class="py-2 px-2 border-b text-sm text-gray-700 w-10 truncate">{{ $document->numero_documento }}</td>
                     <td class="py-2 px-4 border-b text-sm text-gray-700">{{ $document->titulo }}</td>
-                    <td class="py-2 px-4 border-b text-sm text-gray-700">{{ \Carbon\Carbon::parse($document->fecha_ingreso)->format('Y-m-d') }}</td>
+                    <td class="py-2 px-4 border-b text-sm text-gray-700">{{ \Carbon\Carbon::parse($document->fecha_ingreso)->format('d-m-Y') }}</td>
                     <td class="py-2 px-4 border-b text-sm text-gray-700">{{ $document->origen_oficina }}</td>
                     <td class="py-2 px-2 border-b text-sm text-gray-700 w-10 text-center">{{ $document->numero_folios }}</td>
                     <td class="py-2 px-4 border-b text-sm text-gray-700">
@@ -59,6 +124,17 @@
                             <span class="text-gray-500">Sin fecha de salida</span>
                         @endif
                     </td>
+
+                    <td class="py-2 px-4 border-b text-sm text-gray-700">
+                        @if ($document->estado == 'vencido')
+                            <span class="text-red-600 font-bold">Vencido</span>
+                        @elseif ($document->estado == 'emitido')
+                            <span class="text-green-600 font-bold">Emitido</span>
+                        @else
+                            <span class="text-blue-600 font-bold">{{ $document->estado }}</span>
+                        @endif
+                    </td>
+                    
                     <td class="py-2 px-4 border-b text-sm text-gray-700">
                         @if ($document->derivado_oficina)
                             <span class="font-bold text-green-600">Emitido</span>
@@ -135,7 +211,7 @@
             @empty
                 <!-- Si no hay documentos -->
                 <tr>
-                    <td colspan="9" class="text-center">No se encontraron resultados para "<strong>{{ $search }}</strong>"</td>
+                    <td colspan="9" class="text-center">No se encontraron resultados</td>
                 </tr>
             @endforelse
         </tbody>

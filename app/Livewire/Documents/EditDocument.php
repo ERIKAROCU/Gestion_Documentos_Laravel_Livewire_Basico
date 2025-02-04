@@ -7,11 +7,14 @@ use App\Models\Document;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
+use App\Models\Oficina;
 
 class EditDocument extends Component
 {
     public $document;
     public $numero_documento, $fecha_ingreso, $origen_oficina, $titulo, $numero_folios, $detalles;
+
+    public $oficinas = [];
 
     public $documentId;
 
@@ -24,6 +27,8 @@ class EditDocument extends Component
         $this->titulo = $this->document->titulo;
         $this->numero_folios = $this->document->numero_folios;
         $this->detalles = $this->document->detalles;
+
+        $this->oficinas = Oficina::all();
     }
 
     protected function rules()
@@ -52,6 +57,7 @@ class EditDocument extends Component
         'numero_folios.numeric' => 'El número de folios debe ser un número.',
         'detalles.required' => 'Los detalles son obligatorios.',
     ];
+
 
     public function save()
     {

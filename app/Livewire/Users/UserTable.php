@@ -5,6 +5,7 @@ namespace App\Livewire\Users;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class UserTable extends Component
 {
@@ -23,6 +24,14 @@ class UserTable extends Component
         'perPage' => ['except' => 10],
         'isActive' => ['except' => ''],
     ];
+
+    public function  mount(){
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        $usuario = Auth::user();
+    }
 
     public function openCreateModal()
     {
