@@ -56,6 +56,11 @@ class UploadFileDerivation extends Component
         return $diasHabiles;
     }
 
+    public function loadOficinas()
+    {
+        $this->oficinas = Oficina::all();
+    }
+
     public function mount($documentoId = null)
     {
         logger('Documento ID recibido:', [$documentoId]);  // Agrega esta línea para depurar
@@ -85,67 +90,37 @@ class UploadFileDerivation extends Component
     public function save()
     {
         $this->validate();
-    
-        // Verificar si el documento_id está presente
-        if (!$this->documento_id) {
-            session()->flash('error', 'Documento ID no encontrado.');
-            return;
-        }
-    
-        // Buscar el documento
+
         $documento = Document::find($this->documento_id);
-    
-        // Verificar si el documento existe
+
         if (!$documento) {
             session()->flash('error', 'El documento no existe.');
             return;
         }
-    
-        // Calcular los días hábiles entre la fecha de salida y la fecha actual
+
+        // Calcular días hábiles
         $diasHabiles = $this->calcularDiasHabiles($this->fecha_salida, Carbon::now());
 
-        // Si los días hábiles superan el límite (por ejemplo, 5 días)
-        if ($diasHabiles > 5) {
-            $documento->update([
-                'estado' => 'Vencido', // Cambiar el estado a vencido
-            ]);
-        } else {
-            // Si no se ha vencido, el estado se mantiene como emitido
-            $documento->update([
-                'estado' => 'Emitido', // El estado se mantiene como 'Emitido'
-            ]);
-        }
+        // Actualizar el estado del documento
+        $documento->estado = ($diasHabiles > 5) ? 'Vencido' : 'Emitido';
+        $documento->derivado_oficina = $this->derivado_oficina;
+        $documento->fecha_salida = $this->fecha_salida;
+        $documento->trabajador_id = Auth::id();
+        $documento->save();
 
         // Guardar el archivo
         $rutaArchivo = $this->archivo->store('uploads', 'public');
 
-        // Actualizar el documento
-        $documento->update([
-            'derivado_oficina' => $this->derivado_oficina,
-            'fecha_salida' => $this->fecha_salida,
-            'trabajador_id' => Auth::id(), // Asignar el trabajador autenticado
-        ]);
-    
-        // Buscar si ya hay un archivo asociado a este documento
-        $file = File::where('documento_id', $this->documento_id)->first();
-    
-        if ($file) {
-            // Si ya existe, actualizar los datos del archivo
-            $file->update([
+        // Actualizar o crear el archivo
+        File::updateOrCreate(
+            ['documento_id' => $this->documento_id],
+            [
                 'ruta_archivo' => $rutaArchivo,
                 'tipo' => $this->archivo->getClientOriginalExtension(),
                 'nombre_original' => $this->archivo->getClientOriginalName(),
-            ]);
-        } else {
-            // Si no existe, crear un nuevo registro
-            File::create([
-                'documento_id' => $this->documento_id,
-                'ruta_archivo' => $rutaArchivo,
-                'tipo' => $this->archivo->getClientOriginalExtension(),
-                'nombre_original' => $this->archivo->getClientOriginalName(),
-            ]);
-        }
-    
+            ]
+        );
+
         session()->flash('message', 'Archivo subido y documento derivado correctamente.');
         $this->reset();
         return redirect()->route('documents.index');

@@ -104,7 +104,7 @@
         </thead>
         <tbody>
             @forelse ($documents as $document)
-                <tr>
+                <tr wire:key="document-{{ $document->id }}">
                     <td class="py-2 px-2 border-b text-sm text-gray-700 w-10 truncate">{{ $document->numero_documento }}</td>
                     <td class="py-2 px-4 border-b text-sm text-gray-700">{{ $document->titulo }}</td>
                     <td class="py-2 px-4 border-b text-sm text-gray-700">{{ \Carbon\Carbon::parse($document->fecha_ingreso)->format('d-m-Y') }}</td>
@@ -224,7 +224,7 @@
 
     <!-- Modal para editar documento -->
     @if ($showEditModal)
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" wire:ignore>
             <div class="bg-white p-2 rounded-lg shadow-lg w-1/2">
                 @livewire('documents.edit-document', ['documentId' => $documentId], key($documentId))
             </div>

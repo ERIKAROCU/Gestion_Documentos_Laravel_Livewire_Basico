@@ -99,57 +99,46 @@ class DocumentTable extends Component
 
     public function actualizarEstados()
     {
-        $documentos = Document::where('estado', '!=', 'emitido')
-            ->where('estado', '!=', 'vencido')
-            ->get();
+        // Solo actualiza los estados si no se ha hecho recientemente
+        if (cache('estados_actualizados') !== true) {
+            Document::where('estado', '!=', 'emitido')
+                ->where('estado', '!=', 'vencido')
+                ->each(function ($documento) {
+                    if ($documento->esVencido()) {
+                        $documento->estado = 'vencido';
+                        $documento->save();
+                    }
+                });
 
-        foreach ($documentos as $documento) {
-            if ($documento->esVencido()) {
-                $documento->estado = 'vencido';
-                $documento->save();
-            }
+            cache(['estados_actualizados' => true], now()->addMinutes(10)); // Cachear por 10 minutos
         }
     }
 
     public function render()
-    {
-        $this->actualizarEstados(); // Llamamos la función antes de renderizar la vista
+{
+    $this->actualizarEstados(); // Actualizar estados antes de renderizar
 
-        // Consulta base
-        $documents = Document::query()
-            ->when($this->search, function ($query) {
-                // Búsqueda general en múltiples campos
-                $query->where(function ($subquery) {
-                    $subquery->where('numero_documento', 'like', '%' . $this->search . '%')
-                             ->orWhere('titulo', 'like', '%' . $this->search . '%')
-                             ->orWhere('fecha_ingreso', 'like', '%' . $this->search . '%')
-                             ->orWhere('fecha_salida', 'like', '%' . $this->search . '%')
-                             ->orWhere('origen_oficina', 'like', '%' . $this->search . '%')
-                             ->orWhere('derivado_oficina', 'like', '%' . $this->search . '%')
-                             ->orWhere('estado', 'like', '%' . $this->search . '%');
-                });
-            })
-            ->when($this->searchDate, function ($query) {
-                // Filtro por fecha de ingreso
-                $query->whereDate('fecha_ingreso', $this->searchDate);
-            })
-            ->when($this->searchOrigenOficina, function ($query) {
-                // Filtro por oficina de origen
-                $query->where('origen_oficina', $this->searchOrigenOficina);
-            })
-            ->when($this->searchDerivadoOficina, function ($query) {
-                // Filtro por oficina derivada
-                $query->where('derivado_oficina', $this->searchDerivadoOficina);
-            })
-            ->when($this->searchEstado, function ($query) {
-                // Filtro por estado
-                $query->where('estado', $this->searchEstado);
-            })
-            ->orderBy('estado', 'asc')
-            ->paginate($this->perPage);
+    $documents = Document::query()
+        ->when($this->search, function ($query) {
+            $query->where(function ($subquery) {
+                $subquery->where('numero_documento', 'like', '%' . $this->search . '%')
+                         ->orWhere('titulo', 'like', '%' . $this->search . '%')
+                         ->orWhere('fecha_ingreso', 'like', '%' . $this->search . '%')
+                         ->orWhere('fecha_salida', 'like', '%' . $this->search . '%')
+                         ->orWhere('origen_oficina', 'like', '%' . $this->search . '%')
+                         ->orWhere('derivado_oficina', 'like', '%' . $this->search . '%')
+                         ->orWhere('estado', 'like', '%' . $this->search . '%');
+            });
+        })
+        ->when($this->searchDate, fn($query) => $query->whereDate('fecha_ingreso', $this->searchDate))
+        ->when($this->searchOrigenOficina, fn($query) => $query->where('origen_oficina', $this->searchOrigenOficina))
+        ->when($this->searchDerivadoOficina, fn($query) => $query->where('derivado_oficina', $this->searchDerivadoOficina))
+        ->when($this->searchEstado, fn($query) => $query->where('estado', $this->searchEstado))
+        ->orderBy('numero_documento', 'desc')
+        ->paginate($this->perPage);
 
-        return view('livewire.documents.document-table', [
-            'documents' => $documents,
-        ])->layout('layouts.app');
-    }
+    return view('livewire.documents.document-table', [
+        'documents' => $documents,
+    ])->layout('layouts.app');
+}
 }

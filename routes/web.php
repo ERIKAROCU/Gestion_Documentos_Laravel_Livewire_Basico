@@ -12,6 +12,10 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
+use App\Http\Controllers\DashboardController;
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');
+
+
 // 
 use App\Livewire\Documents\CreateDocument;
 Route::get('/documentos/crear', CreateDocument::class)->name('documents.create');

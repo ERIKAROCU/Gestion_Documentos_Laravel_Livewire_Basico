@@ -17,7 +17,7 @@
         </div>
 
         <!-- Oficina de destino -->
-        <div>
+        <div wire:init="loadOficinas">
             <label for="derivado_oficina" class="block text-sm font-medium text-gray-700">Oficina de destino</label>
             <select
                 wire:model="derivado_oficina"

@@ -21,6 +21,11 @@ class Document extends Model
         'estado',
     ];
 
+    protected $casts = [
+        'fecha_ingreso' => 'datetime',
+        'fecha_salida' => 'datetime', // Opcional si necesitas también formatear esta fecha
+    ];
+
     public function files()
     {
         return $this->hasMany(File::class, 'documento_id');
