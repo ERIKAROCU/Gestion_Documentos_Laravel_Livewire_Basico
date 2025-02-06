@@ -33,21 +33,6 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Oficina de Origen -->
-            {{-- <div>
-                <label for="origen_oficina" class="block text-sm font-medium text-gray-700">Oficina de Origen</label>
-                <input
-                    type="text"
-                    wire:model="origen_oficina"
-                    id="origen_oficina"
-                    placeholder="Oficina de Origen"
-                    class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
-                >
-                @error('origen_oficina')
-                    <span class="text-xs text-red-600">{{ $message }}</span>
-                @enderror
-            </div> --}}
-
             <div>
                 <label for="origen_oficina" class="block text-sm font-medium text-gray-700">Oficina de Origen</label>
                 <select

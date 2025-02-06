@@ -58,9 +58,10 @@ class EditDocument extends Component
         'detalles.required' => 'Los detalles son obligatorios.',
     ];
 
-
+    public $loading = false;
     public function save()
     {
+        $this->loading = true;
         $this->validate();
 
         // Actualizar el documento
