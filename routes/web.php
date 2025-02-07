@@ -45,13 +45,15 @@ Route::get('/archivos/subir/{id}', UploadFileDerivation::class)->name('files.upl
 
 
 
-
-
-
-
-
 use App\Livewire\Users\UserTable;
 Route::get('/usuarios', UserTable::class)->name('users.index');
+
+
+
+
+
+use App\Livewire\Oficinas\OficinaTable;
+Route::get('/oficinas', OficinaTable::class)->name('oficinas.oficina-table');
 
 
 

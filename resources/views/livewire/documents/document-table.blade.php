@@ -223,13 +223,13 @@
     </div>
 
     <!-- Modal para editar documento -->
-    @if ($showEditModal)
+   {{--  @if ($showEditModal)
         <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div class="bg-white p-2 rounded-lg shadow-lg w-1/2">
                 @livewire('documents.edit-document', ['documentId' => $documentId], key($documentId))
             </div>
         </div>
-    @endif
+    @endif --}}
 
     @if ($showEditModal)
         <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" wire:ignore>

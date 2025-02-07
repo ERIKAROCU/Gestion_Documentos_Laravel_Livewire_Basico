@@ -1,12 +1,13 @@
 <div class="container mx-auto p-4 bg-gray-50 rounded-lg shadow-md">
-    
-    <!-- Botón para crear usuario -->
-    <button
-        wire:click="openCreateModal"
-        class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 mb-4"
-    >
-        Crear Usuario
-    </button>
+    <div>
+        <ul>
+            <li>
+                <button wire:click="dispatch('showModal')" class="bg-dark btn btn-sm">
+                    Agregar
+                </button>
+            </li>
+        </ul>
+    </div>
 
     <!-- Barra de búsqueda y filtros -->
     <div class="mb-4 flex justify-between items-center">
@@ -36,85 +37,67 @@
         </select>
     </div>
 
-    <!-- Tabla de usuarios -->
-    <table class="min-w-full bg-white border border-gray-300 shadow-sm rounded-lg">
-        <thead>
-            <tr class="bg-gray-100">
-                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Nombre</th>
-                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Correo Electrónico</th>
-                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">DNI</th>
-                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Cargo</th>
-                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Rol</th>
-                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Estado</th>
-                <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($users as $user)
-                <tr>
-                    <td class="py-2 px-4 border-b text-sm text-gray-700">{{ $user->name }}</td>
-                    <td class="py-2 px-4 border-b text-sm text-gray-700">{{ $user->email }}</td>
-                    <td class="py-2 px-4 border-b text-sm text-gray-700">{{ $user->dni }}</td>
-                    <td class="py-2 px-4 border-b text-sm text-gray-700">{{ $user->cargo }}</td>
-                    <td class="py-2 px-4 border-b text-sm text-gray-700">{{ $user->role }}</td>
-                    <td class="py-2 px-4 border-b text-sm text-gray-700">
-                        @if ($user->is_active)
-                            <span class="text-green-600">Activo</span>
-                        @else
-                            <span class="text-red-600">Inactivo</span>
-                        @endif
-                    </td>
-                    <td class="py-2 px-4 border-b text-sm">
-                        <!-- Editar usuario -->
-                        <button
-                            wire:click="openEditModal({{ $user->id }})"
-                            class="text-blue-500 hover:text-blue-700 text-sm"
-                        >
-                            <i class="fas fa-pencil-alt w-5 h-5 inline-block"></i>
-                        </button>
-                        |
-                        <!-- Ver usuario -->
-                        <button
-                            wire:click="openViewModal({{ $user->id }})"
-                            class="text-blue-500 hover:text-blue-700 text-sm"
-                        >
-                            <i class="fas fa-eye w-5 h-5 inline-block"></i>
-                        </button>
-                    </td>
+    <div wire:key="users-table">
+        <table class="w-full border-collapse border border-gray-300">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border border-gray-300 p-2">Nombre</th>
+                    <th class="border border-gray-300 p-2">Correo</th>
+                    <th class="border border-gray-300 p-2">DNI</th>
+                    <th class="border border-gray-300 p-2">Cargo</th>
+                    <th class="border border-gray-300 p-2">Rol</th>
+                    <th class="border border-gray-300 p-2">Estado</th>
+                    <th class="border border-gray-300 p-2">Acciones</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach ($users as $user)
+                    <tr>
+                        <td class="border border-gray-300 p-2">{{ $user->name }}</td>
+                        <td class="border border-gray-300 p-2">{{ $user->email }}</td>
+                        <td class="border border-gray-300 p-2">{{ $user->dni }}</td>
+                        <td class="border border-gray-300 p-2">{{ $user->cargo }}</td>
+                        <td class="border border-gray-300 p-2">{{ $user->role }}</td>
+                        <td class="border border-gray-300 p-2 text-center">
+                            @if ($user->is_active)
+                                <span class="text-green-600">Activo</span>
+                            @else
+                                <span class="text-red-600">Inactivo</span>
+                            @endif
+                        </td>
+                        <td class="border border-gray-300 p-2 text-center">
+                            <!-- Botón Editar -->
+                            <button wire:click="dispatch('edit', { id: {{ $user->id }} })"
+                                class="bg-blue-500 text-white px-3 py-1 rounded">
+                                <i class="fas fa-edit"></i>
+                            </button>
+
+                            <!-- Botón Eliminar -->
+                            {{-- <button onclick="confirmDelete({{ $user->id }})"
+                                class="bg-red-500 text-white px-3 py-1 rounded">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button> --}}
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 
     <!-- Paginación -->
     <div class="mt-4">
         {{ $users->links() }}
     </div>
 
-    <!-- Modal para crear usuario -->
-    @if ($showCreateModal)
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white p-6 rounded-lg shadow-lg w-1/2">
-                @livewire('users.user-form', key('create-user'))
-            </div>
-        </div>
-    @endif
+    {{-- Incluir el modal --}}
+    @livewire('users.user-form')
 
-    <!-- Modal para editar usuario -->
-    @if ($showEditModal)
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white p-6 rounded-lg shadow-lg w-1/2">
-                @livewire('users.user-form', ['userId' => $userId], key($userId))
-            </div>
-        </div>
-    @endif
-
-    <!-- Modal para ver usuario -->
-    @if ($showViewModal)
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white p-6 rounded-lg shadow-lg w-1/2">
-                @livewire('users.user-show', ['userId' => $userId], key($userId))
-            </div>
-        </div>
-    @endif
+    {{-- Script para confirmar eliminación --}}
+    <script>
+        function confirmDelete(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+                Livewire.dispatch('deleteRow', { id: id });
+            }
+        }
+    </script>
 </div>

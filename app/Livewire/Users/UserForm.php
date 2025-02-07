@@ -8,17 +8,11 @@ use Illuminate\Validation\Rule;
 
 class UserForm extends Component
 {
-    public $user;
-    public $name;
-    public $email;
-    public $dni;
-    public $cargo;
-    public $role;
-    public $is_active = true;
-    public $password;
-    public $password_confirmation;
+    public $user_id, $name, $email, $dni, $cargo, $role, $is_active = true;
+    public $password, $password_confirmation;
+    public $modalVisible = false;
 
-    public $isEditing = false;
+    public $isEditing;
 
     protected function rules()
     {
@@ -27,18 +21,18 @@ class UserForm extends Component
             'email' => [
                 'required',
                 'email',
-                Rule::unique('users')->ignore($this->user->id ?? null),
+                Rule::unique('users')->ignore($this->user_id),
             ],
             'dni' => [
                 'required',
                 'string',
                 'max:20',
-                Rule::unique('users')->ignore($this->user->id ?? null),
+                Rule::unique('users')->ignore($this->user_id),
             ],
             'cargo' => 'nullable|string|max:100',
             'role' => 'required|string|in:admin,user',
             'is_active' => 'boolean',
-            'password' => $this->isEditing ? 'nullable|min:8|confirmed' : 'required|min:8|confirmed',
+            'password' => $this->user_id ? 'nullable|min:8|confirmed' : 'required|min:8|confirmed',
         ];
     }
 
@@ -54,18 +48,32 @@ class UserForm extends Component
         'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
     ];
 
-    public function mount($userId = null)
+    protected $listeners = ['edit' => 'loadUser', 'showModal' => 'showModal', 'refreshTable' => '$refresh'];
+
+    public function loadUser($id)
     {
-        if ($userId) {
-            $this->user = User::findOrFail($userId);
-            $this->isEditing = true;
-            $this->name = $this->user->name;
-            $this->email = $this->user->email;
-            $this->dni = $this->user->dni;
-            $this->cargo = $this->user->cargo;
-            $this->role = $this->user->role;
-            $this->is_active = $this->user->is_active;
+        $user = User::find($id);
+        if (!$user) {
+            session()->flash('error', 'El usuario no existe.');
+            return;
         }
+
+        $this->user_id = $user->id;
+        $this->name = $user->name;
+        $this->email = $user->email;
+        $this->dni = $user->dni;
+        $this->cargo = $user->cargo;
+        $this->role = $user->role;
+        $this->is_active = $user->is_active;
+        
+        $this->modalVisible = true;
+    }
+
+    public function showModal()
+    {
+        $this->reset(['user_id', 'name', 'email', 'dni', 'cargo', 'role', 'password', 'password_confirmation']);
+        $this->resetValidation();
+        $this->modalVisible = true;
     }
 
     public function save()
@@ -85,26 +93,16 @@ class UserForm extends Component
             $data['password'] = bcrypt($this->password);
         }
 
-        if ($this->isEditing) {
-            $this->user->update($data);
-            session()->flash('message', 'Usuario actualizado correctamente.');
-        } else {
-            User::create($data);
-            session()->flash('message', 'Usuario creado correctamente.');
-        }
-
-        $this->dispatch('closeModal');
-        return redirect()->route('users.index');
+        User::updateOrCreate(['id' => $this->user_id], $data);
+        
+        session()->flash('message', $this->user_id ? 'Usuario actualizado.' : 'Usuario creado.');
+        
+        $this->modalVisible = false;
+        $this->dispatch('refreshTable');
     }
 
     public function render()
     {
         return view('livewire.users.user-form');
     }
-
-    public function closeModal()
-    {
-        return redirect(route('users.index'));
-    }
-    
 }

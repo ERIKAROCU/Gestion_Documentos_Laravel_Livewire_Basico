@@ -5,7 +5,6 @@ namespace App\Livewire\Users;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 
 class UserTable extends Component
 {
@@ -13,49 +12,19 @@ class UserTable extends Component
 
     public $search = ''; // Búsqueda general
     public $perPage = 10; // Número de usuarios por página
-    public $isActive = ''; // Estado del filtro de activos/inactivos
-    public $showCreateModal = false; // Modal para crear usuario
-    public $showEditModal = false; // Modal para editar usuario
-    public $showViewModal = false; // Modal para ver usuario
-    public $userId = null; // ID del usuario a editar/ver
+    public $isActive = ''; // Filtro de estado (activos/inactivos)
 
-    protected $queryString = [
-        'search' => ['except' => ''],
-        'perPage' => ['except' => 10],
-        'isActive' => ['except' => ''],
-    ];
+    protected $paginationTheme = 'bootstrap';
+    protected $listeners = ['refreshTable' => '$refresh', 'deleteRow' => 'deleteRow'];
 
-    public function  mount(){
-        if (!Auth::check()) {
-            return redirect()->route('login');
+    public function deleteRow($id)
+    {
+        $user = User::find($id);
+        if ($user) {
+            $user->delete();
+            session()->flash('message', 'Usuario eliminado correctamente.');
+            $this->dispatch('refreshTable'); // Refrescar la tabla después de eliminar
         }
-
-        $usuario = Auth::user();
-    }
-
-    public function openCreateModal()
-    {
-        $this->showCreateModal = true;
-    }
-
-    public function openEditModal($userId)
-    {
-        $this->userId = $userId;
-        $this->showEditModal = true;
-    }
-
-    public function openViewModal($userId)
-    {
-        $this->userId = $userId;
-        $this->showViewModal = true;
-    }
-
-    public function closeModal()
-    {
-        $this->showCreateModal = false;
-        $this->showEditModal = false;
-        $this->showViewModal = false;
-        $this->userId = null;
     }
 
     public function render()
@@ -70,11 +39,9 @@ class UserTable extends Component
             ->when($this->isActive !== '', function ($query) {
                 $query->where('is_active', $this->isActive);
             })
-            ->orderBy('name', 'asc')
+            ->orderBy('id', 'desc')
             ->paginate($this->perPage);
 
-        return view('livewire.users.user-table', [
-            'users' => $users,
-        ])->layout('layouts.app');
+        return view('livewire.users.user-table', compact('users'))->layout('layouts.app');
     }
 }
