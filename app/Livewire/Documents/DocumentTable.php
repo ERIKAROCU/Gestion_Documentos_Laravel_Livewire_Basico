@@ -51,52 +51,6 @@ class DocumentTable extends Component
         $this->reset(['search', 'searchDate', 'searchOrigenOficina', 'searchDerivadoOficina', 'searchEstado']);
     }
 
-    // Abrir modal de edición
-    public function editDocument($id)
-    {
-        $this->documentId = $id;
-        $this->showEditModal = true;
-    }
-
-    // Cerrar modal de edición
-    public function closeEditModal()
-    {
-        $this->showEditModal = false;
-    }
-
-    // Abrir modal de emisión
-    public function emitDocument($id)
-    {
-        $this->documentoId = $id;
-        $this->showEmitModal = true;
-    }
-
-    // Cerrar modal de emisión
-    public function closeEmitModal()
-    {
-        $this->showEmitModal = false;
-    }
-
-    // Abrir modal de ver
-    public function verDocument($id)
-    {
-        $this->documentoId = $id;
-        $this->document = Document::find($id);
-
-        if (!$this->document) {
-            session()->flash('error', 'Documento no encontrado.');
-            return;
-        }
-
-        $this->showVerModal = true;
-    }
-
-    // Cerrar modal de ver
-    public function closeVerModal()
-    {
-        $this->showVerModal = false;
-    }
-
     public function actualizarEstados()
     {
         // Solo actualiza los estados si no se ha hecho recientemente
