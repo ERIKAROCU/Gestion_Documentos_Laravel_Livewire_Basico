@@ -53,7 +53,7 @@ class DocumentForm extends Component
         }
     }
 
-    protected $listeners = ['edit' => 'loadDocument', 'showModal' => 'showModal', 'refreshTable' => '$refresh'];
+    protected $listeners = ['edit' => 'loadDocument', 'showDocumentFormModal' => 'showModal', 'refreshTable' => '$refresh'];
 
     public function loadDocument($id)
     {

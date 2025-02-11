@@ -35,7 +35,7 @@ new class extends Component
                     </x-nav-link>
                 </div> --}}
 
-                <h2 class="text-center text-2xl font-semibold text-gray-700 mb-4">Gestion de Documentos</h2>
+                {{-- <h2 class="text-center text-2xl font-semibold text-gray-700 mb-4">Gestion de Documentos</h2> --}}
             </div>
 
             <!-- Settings Dropdown -->

@@ -1,15 +1,17 @@
 <div class="container mx-auto p-4 bg-gray-50 rounded-lg shadow-md">
     <div>
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-4">Gestión de Documentos</h1>
+    </div>
+    <div>
         <ul>
             <li>
-                <button wire:click="dispatch('showModal')" class="bg-dark btn btn-sm">
-                    Agregar
+                <button wire:click="$dispatch('showDocumentFormModal')" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-file-upload"></i>  Agregar
                 </button>
             </li>
         </ul>
     </div>
     <br>
-    <!-- Barra de búsqueda y filtros -->
     <div class="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Filtro por fecha -->
         <div>
@@ -98,35 +100,35 @@
         <!-- Tabla de documentos -->
         <table class="min-w-full bg-white border border-gray-300 shadow-sm rounded-lg">
             <thead>
-                <tr class="bg-gray-100">
-                    <th class="py-2 px-2 border-b text-left text-sm font-medium text-gray-600 w-10">Número de Documento</th>
-                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Título</th>
-                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Fecha de Ingreso</th>
-                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Oficina de Origen</th>
-                    <th class="py-2 px-2 border-b text-left text-sm font-medium text-gray-600 w-10">Folios</th>
-                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Derivado Oficina</th>
-                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Fecha de Salida</th>
-                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Estado</th>
-                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Tiempo Restante</th>
-                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-600">Acciones</th>
+                <tr class="bg-gray-200">
+                    <th class="py-2 px-2 border-b text-left text-sm font-medium text-gray-900 w-10">Número de Documento</th>
+                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-900">Título</th>
+                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-900">Fecha de Ingreso</th>
+                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-900">Oficina de Origen</th>
+                    <th class="py-2 px-2 border-b text-left text-sm font-medium text-gray-900 w-10">Folios</th>
+                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-900">Derivado Oficina</th>
+                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-900">Fecha de Salida</th>
+                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-900">Estado</th>
+                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-900">Tiempo Restante</th>
+                    <th class="py-2 px-4 border-b text-left text-sm font-medium text-gray-900">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($documents as $document)
                     <tr wire:key="document-{{ $document->id }}">
-                        <td class="py-2 px-2 border-b text-sm text-gray-700 w-10 truncate">{{ $document->numero_documento }}</td>
-                        <td class="py-2 px-4 border-b text-sm text-gray-700">{{ $document->titulo }}</td>
-                        <td class="py-2 px-4 border-b text-sm text-gray-700">{{ \Carbon\Carbon::parse($document->fecha_ingreso)->format('d-m-Y') }}</td>
-                        <td class="py-2 px-4 border-b text-sm text-gray-700">{{ $document->origen_oficina }}</td>
-                        <td class="py-2 px-2 border-b text-sm text-gray-700 w-10 text-center">{{ $document->numero_folios }}</td>
-                        <td class="py-2 px-4 border-b text-sm text-gray-700">
+                        <td class="py-2 px-4 border-b text-sm text-gray-800 w-10 truncate">{{ $document->numero_documento }}</td>
+                        <td class="py-2 px-4 border-b text-sm text-gray-800">{{ $document->titulo }}</td>
+                        <td class="py-2 px-4 border-b text-sm text-gray-800">{{ \Carbon\Carbon::parse($document->fecha_ingreso)->format('d-m-Y') }}</td>
+                        <td class="py-2 px-4 border-b text-sm text-gray-800">{{ $document->origen_oficina }}</td>
+                        <td class="py-2 px-4 border-b text-sm text-gray-800 w-10 text-center">{{ $document->numero_folios }}</td>
+                        <td class="py-2 px-4 border-b text-sm text-gray-800">
                             @if ($document->derivado_oficina)
                                 {{ $document->derivado_oficina }}
                             @else
                                 <span class="text-gray-500">Sin derivar</span>
                             @endif
                         </td>
-                        <td class="py-2 px-4 border-b text-sm text-gray-700">
+                        <td class="py-2 px-4 border-b text-sm text-gray-800">
                             @if ($document->fecha_salida)
                                 {{ \Carbon\Carbon::parse($document->fecha_salida)->format('Y-m-d') }}
                             @else
@@ -134,7 +136,7 @@
                             @endif
                         </td>
 
-                        <td class="py-2 px-4 border-b text-sm text-gray-700">
+                        <td class="py-2 px-4 border-b text-sm text-gray-800">
                             @if ($document->estado == 'vencido')
                                 <span class="text-red-600 font-bold">Vencido</span>
                             @elseif ($document->estado == 'emitido')
@@ -144,7 +146,7 @@
                             @endif
                         </td>
                         
-                        <td class="py-2 px-4 border-b text-sm text-gray-700">
+                        <td class="py-2 px-4 border-b text-sm text-gray-800">
                             @if ($document->derivado_oficina)
                                 <span class="font-bold text-green-600">Emitido</span>
                             @else
@@ -195,33 +197,33 @@
                             <!-- Descargar archivo -->
                             @if ($document->files->isNotEmpty())
                                 <a href="{{ route('files.download', $document->files->first()->id) }}" class="text-blue-500 hover:text-blue-700 text-sm">
-                                    <i class="fas fa-arrow-down w-5 h-5 inline-block"></i>
+                                    <i class="fas fa-download"></i>
                                 </a>                        
                             @else
-                                <span class="text-red-500">Sin archivo</span>
+                                <span class="text-red-500">
+                                    <i class="fas fa-file-circle-xmark"></i> Sin archivo
+                                </span>
                             @endif
-                            |
                         
                             <!-- Editar documento -->
                             <button wire:click="dispatch('edit', { id: {{ $document->id }} })"
                                 class="bg-blue-500 text-white px-3 py-1 rounded">
-                                <i class="fas fa-edit"></i>
+                                <i class="fa fa-edit"></i>
                             </button>
-                            |
                         
                             <!-- Emitir documento -->
                             <button wire:click="dispatch('emitDocument', { id: {{ $document->id }} })"
-                                class="text-blue-500 hover:text-blue-700 text-sm">
-                                <i class="fas fa-share-square w-5 h-5 inline-block"></i>
+                                class="bg-green-600 text-white px-3 py-1 rounded">
+                                <i class="fas fa-paper-plane"></i>
                             </button>
-                            |
                         
-                            <!-- Ver documento -->
-                            <button wire:click="dispatch('verDocument', { id: {{ $document->id }} })"
-                                class="text-blue-500 hover:text-blue-700 text-sm">
-                                <i class="fas fa-eye w-5 h-5 inline-block"></i>
+                            {{-- Ver documento --}}
+                            <button wire:click="dispatch('viewDocument', { id: {{ $document->id }} })"
+                                class="bg-yellow-600 text-white px-3 py-1 rounded">
+                                <i class="fas fa-eye"></i>
                             </button>
                         </td>
+                        
                     </tr>
                 @empty
                     <!-- Si no hay documentos -->
@@ -239,5 +241,7 @@
     </div>
 
     @livewire('documents.document-form')
+    @livewire('documents.document-show')
+    @livewire('files.upload-file-derivation')
 
 </div>

@@ -14,12 +14,11 @@ class UploadFileDerivation extends Component
 {
     use WithFileUploads;
 
-    public $documento_id;
-    public $archivo;
-    public $derivado_oficina;
-    public $fecha_salida;
-    public $titulo;
+    public $documento_id, $archivo, $derivado_oficina, $fecha_salida, $titulo;
     public $oficinas = [];
+    public $modalVisible = false;
+
+    public $isEditing;
 
     protected $rules = [
         'archivo' => 'required|file|mimes:pdf,doc,docx,xlsx|max:10240', // 10 MB máximo
@@ -38,6 +37,47 @@ class UploadFileDerivation extends Component
         'fecha_salida.date' => 'La fecha de salida debe ser una fecha válida.',
         'titulo.required' => 'El título es obligatorio.',
     ];
+
+    protected $listeners = ['emitDocument' => 'loadDocument', 'showUploadFileDerivationModal' => 'showModal', 'refreshTable' => '$refresh'];
+
+    public function loadDocument($id)
+    {
+        $document = Document::find($id);
+        if (!$document) {
+            session()->flash('error', 'El documento no existe.');
+            return;
+        }
+
+        $this->documento_id = $document->id;
+        $this->titulo = $document->titulo;
+        $this->derivado_oficina = $document->derivado_oficina;
+        $this->fecha_salida = $document->fecha_salida ? Carbon::parse($document->fecha_salida)->format('Y-m-d') : null;
+
+        // Cargar el archivo subido previamente (si existe)
+        if ($document->files->isNotEmpty()) {
+            $this->archivo = $document->files->first()->ruta_archivo; // Asignar la ruta del archivo
+        }
+
+        $this->isEditing = true;
+        $this->oficinas = Oficina::all();
+        $this->modalVisible = true;
+    }
+
+    public function showModal()
+    {
+        $this->reset(['documento_id', 'archivo', 'derivado_oficina', 'fecha_salida', 'titulo']);
+        $this->resetValidation();
+        $this->oficinas = Oficina::all(); // Recargar oficinas cada vez que se abre el modal
+        $this->isEditing = false;
+        $this->modalVisible = true;
+    }
+
+    public function closeModal()
+    {
+        $this->modalVisible = false;
+        $this->reset(['documento_id', 'archivo', 'derivado_oficina', 'fecha_salida', 'titulo']);
+        $this->resetValidation();
+    }
 
     // Calcular días hábiles
     private function calcularDiasHabiles($fechaEntrada)
@@ -126,13 +166,10 @@ class UploadFileDerivation extends Component
         return redirect()->route('documents.index');
     }
 
-    public function closeModal()
-    {
-        return redirect(route('documents.index')); // Esto redirige a la página anterior
-    }
-
     public function render()
     {
-        return view('livewire.files.upload-file-derivation')->layout('layouts.app');
+        return view('livewire.files.upload-file-derivation', [
+            'oficinas' => $this->oficinas,
+        ])->layout('layouts.app');
     }
 }

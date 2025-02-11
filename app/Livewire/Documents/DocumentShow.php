@@ -7,17 +7,30 @@ use App\Models\Document;
 
 class DocumentShow extends Component
 {
-    public $documentoId;
+    public $numero_documento, $fecha_ingreso, $origen_oficina, $titulo, $numero_folios, $detalles;
+    public $documentId, $document_id;
     public $document;
 
-    public function mount($documentoId)
+    public $modalVisible = false;
+
+    protected $listeners = ['viewDocument' => 'loadDocument', 'showDocumentShowModal' => 'showModal', 'refreshTable' => '$refresh'];
+
+    public function loadDocument($id)
     {
-        $this->document = Document::find($documentoId);
+        $this->document = Document::find($id); // Asignar el documento completo
+        if (!$this->document) {
+            session()->flash('error', 'El documento no existe.');
+            return;
+        }
+
+        $this->modalVisible = true; // Mostrar el modal
     }
 
-    public function closeModal()
+    public function showModal()
     {
-        return redirect(route('documents.index')); // Notifica al componente padre para cerrar el modal
+        $this->reset(['documentId', 'numero_documento', 'fecha_ingreso', 'origen_oficina', 'titulo', 'numero_folios', 'detalles']);
+        $this->resetValidation();
+        $this->modalVisible = true;
     }
 
     public function render()

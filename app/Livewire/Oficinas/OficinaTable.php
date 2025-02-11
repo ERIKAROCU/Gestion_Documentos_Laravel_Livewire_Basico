@@ -10,8 +10,15 @@ class OficinaTable extends Component
 {
     use WithPagination;
 
-    protected $paginationTheme = 'bootstrap';
+    public $search = ''; // Búsqueda general
+    public $perPage = 10; // Número de usuarios por página
+
     protected $listeners = ['refreshTable' => '$refresh', 'deleteRow' => 'deleteRow'];
+
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'perPage' => ['except' => 10],
+    ];
 
     public function deleteRow($id)
     {
@@ -23,13 +30,15 @@ class OficinaTable extends Component
         }
     }
 
-
-
     public function render()
     {
-        return view('livewire.oficinas.oficina-table', [
-            'oficinas' => Oficina::orderBy('id', 'desc')
-            ->paginate(10)
-        ])->layout('layouts.app');
+        $oficinas = Oficina::query()
+            ->when($this->search, function ($query) {
+                $query->where('nombre_oficina', 'like', '%' . $this->search . '%');
+            })
+            ->orderBy('id', 'desc')
+            ->paginate($this->perPage);
+
+        return view('livewire.oficinas.oficina-table', compact('oficinas'))->layout('layouts.app');
     }
 }

@@ -1,128 +1,44 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+    <div class="container mx-auto p-4 bg-gray-50 rounded-lg shadow-md">
+        <div>
+            <h1 class="text-2xl font-bold text-center text-gray-800 mb-4">Dashboard</h1>
+        </div>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Pestañas -->
-            <div x-data="{ tab: 'documents' }" class="mb-8">
-                <!-- Botones de Pestañas -->
-                <div class="flex space-x-4 border-b">
-                    <button @click="tab = 'documents'" :class="{ 'border-b-2 border-blue-500': tab === 'documents' }" class="px-4 py-2 text-gray-700 focus:outline-none">
-                        Documentos
-                    </button>
-                    <button @click="tab = 'users'" :class="{ 'border-b-2 border-blue-500': tab === 'users' }" class="px-4 py-2 text-gray-700 focus:outline-none">
-                        Usuarios
-                    </button>
-                </div>
+        <div class="py-12">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <!-- Pestañas -->
+                <div x-data="{ tab: 'myactivity' }" class="mb-8">
+                    <!-- Botones de Pestañas -->
+                    <div class="flex space-x-4 border-b">
+                        <button @click="tab = 'myactivity'" :class="{ 'border-b-2 border-blue-500': tab === 'myactivity' }" class="px-4 py-2 text-gray-700 focus:outline-none">
+                            Mis actividades
+                        </button>
 
-                <!-- Contenido de las Pestañas -->
-                <div x-show="tab === 'documents'" class="mt-6">
-                    <!-- Tarjetas de Estadísticas -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                        <!-- Total de Documentos -->
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800">Total de Documentos</h3>
-                            <p class="text-2xl font-bold text-blue-600">{{ $totalDocumentos }}</p>
-                        </div>
+                        @if(Auth::check() && Auth::user()->role === 'admin')
+                        <button @click="tab = 'documents'" :class="{ 'border-b-2 border-blue-500': tab === 'documents' }" class="px-4 py-2 text-gray-700 focus:outline-none">
+                            Documentos
+                        </button>
+                        @endif
 
-                        <!-- Documentos Recibidos -->
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800">Recibidos</h3>
-                            <p class="text-2xl font-bold text-green-600">{{ $documentosRecibidos }}</p>
-                        </div>
-
-                        <!-- Documentos Emitidos -->
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800">Emitidos</h3>
-                            <p class="text-2xl font-bold text-yellow-600">{{ $documentosEmitidos }}</p>
-                        </div>
-
-                        <!-- Documentos Vencidos -->
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800">Vencidos</h3>
-                            <p class="text-2xl font-bold text-red-600">{{ $documentosVencidos }}</p>
-                        </div>
+                        @if(Auth::check() && Auth::user()->role === 'admin')
+                        <button @click="tab = 'users'" :class="{ 'border-b-2 border-blue-500': tab === 'users' }" class="px-4 py-2 text-gray-700 focus:outline-none">
+                            Usuarios
+                        </button>
+                        @endif
                     </div>
-                    <!-- Gráficos para Documentos -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Gráfico de Líneas - Documentos Registrados por Día -->
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Documentos Registrados por Día</h3>
-                            <canvas id="lineChartDocuments"></canvas>
-                        </div>
 
-                        <!-- Gráfico de Barras - Documentos por Estado -->
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Documentos por Estado</h3>
-                            <canvas id="barChartDocuments"></canvas>
-                        </div>
-
-                        <!-- Gráfico de Torta - Distribución de Documentos por Origen -->
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Documentos por Origen</h3>
-                            <canvas id="pieChartDocuments"></canvas>
-                        </div>
-
-                        <!-- Gráfico de Líneas - Documentos Vencidos en el Tiempo -->
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Documentos Vencidos en el Tiempo</h3>
-                            <canvas id="lineChartExpiredDocuments"></canvas>
-                        </div>
+                    <!-- Contenido de las Pestañas -->
+                    <div x-show="tab === 'documents'" class="mt-6">
+                        @include('partials._documents')
                     </div>
-                </div>
 
-                <div x-show="tab === 'users'" class="mt-6">
-                    <!-- Tarjetas de Estadísticas -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                        <!-- Total de Usuarios -->
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800">Total de Usuarios</h3>
-                            <p class="text-2xl font-bold text-blue-600">{{ $totalUsuarios }}</p>
-                        </div>
-
-                        <!-- Activos -->
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800">Activos</h3>
-                            <p class="text-2xl font-bold text-green-600">{{ $usuariosActivos }}</p>
-                        </div>
-
-                        <!-- Inactivos -->
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800">Inactivos</h3>
-                            <p class="text-2xl font-bold text-red-600">{{ $usuariosInactivos }}</p>
-                        </div>
+                    <div x-show="tab === 'users'" class="mt-6">
+                        @include('partials._users')
                     </div>
-                    <!-- Gráficos para Usuarios -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Gráfico de Barras - Usuarios por Cargo -->
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Usuarios por Cargo</h3>
-                            <canvas id="barChartUsersByRole"></canvas>
-                        </div>
 
-                        <!-- Gráfico de Torta - Roles de Usuarios -->
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Distribución de Roles</h3>
-                            <canvas id="pieChartUsersByRole"></canvas>
-                        </div>
-
-                        <!-- Gráfico de Barras - Usuarios Activos e Inactivos -->
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Usuarios Activos e Inactivos</h3>
-                            <canvas id="barChartUsersActive"></canvas>
-                        </div>
-
-                        <!-- Gráfico de Líneas - Usuarios Registrados en el Tiempo -->
-                        <div class="bg-white p-6 rounded-lg shadow-md">
-                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Usuarios Registrados en el Tiempo</h3>
-                            <canvas id="lineChartUsersOverTime"></canvas>
-                        </div>
+                    <div x-show="tab === 'myactivity'" class="mt-6">
+                        @include('partials._myactivity')
                     </div>
-                </div>
             </div>
         </div>
     </div>
@@ -153,14 +69,14 @@
                     label: 'Documentos por Estado',
                     data: {!! json_encode($documentosPorEstado['cantidades']) !!},
                     backgroundColor: [
-                        'rgba(59, 130, 246, 0.6)', // Azul
-                        'rgba(252, 211, 77, 0.6)', // Amarillo
                         'rgba(239, 68, 68, 0.6)', // Rojo
+                        'rgba(34, 197, 94, 0.6)', // Verde
+                        'rgba(59, 130, 246, 0.6)', // Azul
                     ],
                     borderColor: [
-                        'rgba(59, 130, 246, 1)',
-                        'rgba(252, 211, 77, 1)',
-                        'rgba(239, 68, 68, 1)',
+                        'rgba(239, 68, 68, 0.6)', // Rojo
+                        'rgba(34, 197, 94, 0.6)', // Verde
+                        'rgba(59, 130, 246, 0.6)', // Azul
                     ],
                     borderWidth: 1
                 }]
@@ -274,4 +190,5 @@
             }
         });
     </script>
+    </div>
 </x-app-layout>

@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
 
 Route::view('/', 'welcome');
 
@@ -11,6 +13,11 @@ Route::view('dashboard', 'dashboard')
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
+
+Route::post('/logout', function () {
+    Auth::logout();
+    return redirect('/');
+})->name('logout');
 
 use App\Http\Controllers\DashboardController;
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');

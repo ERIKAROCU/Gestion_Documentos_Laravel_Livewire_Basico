@@ -20,9 +20,6 @@ class DocumentTable extends Component
     public $searchDerivadoOficina = ''; // Filtro por oficina derivada
     public $searchEstado = ''; // Filtro por estado
 
-    public $showEditModal = false; // Modal de edición
-    public $showEmitModal = false; // Modal de emisión
-    public $showVerModal = false; // Modal de ver
     public $documentId; // ID del documento a editar
     public $documentoId; // ID del documento a emitir
     public $document;
@@ -36,7 +33,7 @@ class DocumentTable extends Component
         'searchDerivadoOficina' => ['except' => ''],
         'searchEstado' => ['except' => ''],
     ];
-
+    
     public function  mount(){
         if (!Auth::check()) {
             return redirect()->route('login');

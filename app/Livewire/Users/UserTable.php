@@ -14,7 +14,6 @@ class UserTable extends Component
     public $perPage = 10; // Número de usuarios por página
     public $isActive = ''; // Filtro de estado (activos/inactivos)
 
-    protected $paginationTheme = 'bootstrap';
     protected $listeners = ['refreshTable' => '$refresh', 'deleteRow' => 'deleteRow'];
 
     public function deleteRow($id)
@@ -26,7 +25,6 @@ class UserTable extends Component
             $this->dispatch('refreshTable'); // Refrescar la tabla después de eliminar
         }
     }
-
     public function render()
     {
         $users = User::query()
