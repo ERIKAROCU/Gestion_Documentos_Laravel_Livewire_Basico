@@ -7,12 +7,19 @@ use App\Models\Document;
 use App\Models\User;
 use DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Obtener estadísticas
+        $colores = [
+            'vencido' => 'red',
+            'emitido' => 'green',
+            'recibido' => 'blue',
+        ];
+
+        // Obtener estadísticas generales
         $totalDocumentos = Document::count();
         $documentosRecibidos = Document::where('estado', 'recibido')->count();
         $documentosEmitidos = Document::where('estado', 'emitido')->count();
@@ -24,7 +31,6 @@ class DashboardController extends Controller
         // Obtener los últimos documentos ingresados
         $ultimosDocumentos = Document::orderBy('created_at', 'desc')->take(5)->get();
 
-
         // Datos para gráficos de documentos
         $documentosPorDia = Document::selectRaw('DATE(fecha_ingreso) as fecha, COUNT(*) as cantidad')
             ->groupBy('fecha')
@@ -33,7 +39,14 @@ class DashboardController extends Controller
 
         $documentosPorEstado = Document::select('estado', DB::raw('COUNT(*) as cantidad'))
             ->groupBy('estado')
-            ->get();
+            ->get()
+            ->map(function ($item) use ($colores) {
+                return [
+                    'estado' => $item->estado,
+                    'cantidad' => $item->cantidad,
+                    'color' => $colores[$item->estado] ?? 'gray', // Color gris por si hay otros estados no definidos
+                ];
+            });
 
         $documentosPorOrigen = Document::select('origen_oficina', DB::raw('COUNT(*) as cantidad'))
             ->groupBy('origen_oficina')
@@ -63,8 +76,54 @@ class DashboardController extends Controller
             ->orderBy('month')
             ->get();
 
-        return view('dashboard', [
+        // Datos para gráficos del usuario autenticado
+        $userId = Auth::id();
 
+        $documentosUsuario = Document::where('trabajador_id', $userId)->count();
+
+        $documentosUsuarioPorEstado = Document::where('trabajador_id', $userId)
+        ->select('estado', DB::raw('COUNT(*) as cantidad'))
+        ->groupBy('estado')
+        ->pluck('cantidad', 'estado');
+
+        $documentosEstadoRecibido = $documentosUsuarioPorEstado['recibido'] ?? 0;
+        $documentosEstadoEmitido = $documentosUsuarioPorEstado['emitido'] ?? 0;
+        $documentosEstadoVencido = $documentosUsuarioPorEstado['vencido'] ?? 0;
+
+
+        $documentosUsuarioPorDia = Document::where('trabajador_id', $userId)
+            ->selectRaw('DATE(fecha_ingreso) as fecha, COUNT(*) as cantidad')
+            ->groupBy('fecha')
+            ->orderBy('fecha')
+            ->get();
+
+        $documentosUsuarioPorMes = Document::where('trabajador_id', $userId)
+            ->selectRaw('YEAR(fecha_ingreso) as year, MONTH(fecha_ingreso) as month, COUNT(*) as cantidad')
+            ->groupBy('year', 'month')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get();
+
+        $documentosUsuarioPorAnio = Document::where('trabajador_id', $userId)
+            ->selectRaw('YEAR(fecha_ingreso) as year, COUNT(*) as cantidad')
+            ->groupBy('year')
+            ->orderBy('year')
+            ->get();
+
+        $documentosUsuarioPorEstadoGraficos = Document::where('trabajador_id', $userId)
+            ->select('estado', DB::raw('COUNT(*) as cantidad'))
+            ->groupBy('estado')
+            ->get()
+            ->map(function ($item) use ($colores) {
+                return [
+                    'estado' => $item->estado,
+                    'cantidad' => $item->cantidad,
+                    'color' => $colores[$item->estado] ?? 'gray', // Color gris por si hay otros estados no definidos
+                ];
+            });
+
+        return view('dashboard', [
+            // Estadísticas generales
             'totalDocumentos' => $totalDocumentos,
             'documentosRecibidos' => $documentosRecibidos,
             'documentosEmitidos' => $documentosEmitidos,
@@ -81,6 +140,7 @@ class DashboardController extends Controller
             'documentosPorEstado' => [
                 'estados' => $documentosPorEstado->pluck('estado'),
                 'cantidades' => $documentosPorEstado->pluck('cantidad'),
+                'colores' => $documentosPorEstado->pluck('color'),
             ],
             'documentosPorOrigen' => [
                 'origenes' => $documentosPorOrigen->pluck('origen_oficina'),
@@ -107,6 +167,34 @@ class DashboardController extends Controller
                     return Carbon::create()->month($item->month)->format('F Y');
                 }),
                 'cantidades' => $usuariosRegistradosPorMes->pluck('cantidad'),
+            ],
+
+            // Datos para gráficos del usuario autenticado
+
+            'documentosUsuario' => $documentosUsuario,
+
+            'documentosEstadoRecibido' => $documentosEstadoRecibido,
+            'documentosEstadoEmitido' => $documentosEstadoEmitido,
+            'documentosEstadoVencido' => $documentosEstadoVencido,
+
+            'documentosUsuarioPorDia' => [
+                'fechas' => $documentosUsuarioPorDia->pluck('fecha'),
+                'cantidades' => $documentosUsuarioPorDia->pluck('cantidad'),
+            ],
+            'documentosUsuarioPorMes' => [
+                'meses' => $documentosUsuarioPorMes->map(function ($item) {
+                    return Carbon::create()->month($item->month)->format('F Y');
+                }),
+                'cantidades' => $documentosUsuarioPorMes->pluck('cantidad'),
+            ],
+            'documentosUsuarioPorAnio' => [
+                'anios' => $documentosUsuarioPorAnio->pluck('year'),
+                'cantidades' => $documentosUsuarioPorAnio->pluck('cantidad'),
+            ],
+            'documentosUsuarioPorEstadoGraficos' => [
+                'estados' => $documentosUsuarioPorEstadoGraficos->pluck('estado'),
+                'cantidades' => $documentosUsuarioPorEstadoGraficos->pluck('cantidad'),
+                'colores' => $documentosUsuarioPorEstadoGraficos->pluck('color'),
             ],
         ]);
     }

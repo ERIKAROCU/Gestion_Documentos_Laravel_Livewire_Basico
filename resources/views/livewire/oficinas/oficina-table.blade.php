@@ -44,18 +44,18 @@
                     <tr wire:key="oficina-{{ $oficina->id }}">
                         <td class="py-2 px-4 border-b text-sm text-gray-800">{{ $oficina->id }}</td>
                         <td class="py-2 px-4 border-b text-sm text-gray-800">{{ $oficina->nombre_oficina }}</td>
-                        <td class="py-2 px-4 border-b text-sm text-gray-800 text-center">
+                        <td class="border border-gray-300 p-2 text-center">
                             {{-- Botón Editar --}}
                             <button wire:click="dispatch('edit', { id: {{ $oficina->id }} })"
-                                class="bg-blue-500 text-white px-3 py-1 rounded">
+                                class="bg-blue-600 hover:bg-blue-800 text-white px-3 py-1 rounded" title="Editar">
                                 <i class="fas fa-edit"></i>
                              </button>
 
                             {{-- Botón Eliminar --}}
-                            <button onclick="confirmDelete({{ $oficina->id }})"
+                            {{-- <button onclick="confirmDelete({{ $oficina->id }})"
                                 class="bg-red-500 text-white px-3 py-1 rounded">
                                 <i class="fas fa-trash"></i>
-                            </button>
+                            </button> --}}
                         </td>
                     </tr>
                 @endforeach

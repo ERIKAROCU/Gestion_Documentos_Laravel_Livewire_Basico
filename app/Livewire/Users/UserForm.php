@@ -12,7 +12,7 @@ class UserForm extends Component
     public $password, $password_confirmation;
     public $modalVisible = false;
 
-    public $isEditing;
+    public $isEditing = false;
 
     protected function rules()
     {
@@ -66,6 +66,7 @@ class UserForm extends Component
         $this->role = $user->role;
         $this->is_active = $user->is_active;
         
+        $this->isEditing = true;
         $this->modalVisible = true;
     }
 
@@ -73,6 +74,7 @@ class UserForm extends Component
     {
         $this->reset(['user_id', 'name', 'email', 'dni', 'cargo', 'role', 'password', 'password_confirmation']);
         $this->resetValidation();
+        $this->isEditing = false;
         $this->modalVisible = true;
     }
 
@@ -98,6 +100,7 @@ class UserForm extends Component
         session()->flash('message', $this->user_id ? 'Usuario actualizado.' : 'Usuario creado.');
         
         $this->modalVisible = false;
+        $this->isEditing = true;
         $this->dispatch('refreshTable');
     }
 

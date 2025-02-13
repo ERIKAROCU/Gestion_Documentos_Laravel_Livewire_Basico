@@ -73,8 +73,13 @@
                         <td class="border border-gray-300 p-2 text-center">
                             <!-- Botón Editar -->
                             <button wire:click="dispatch('edit', { id: {{ $user->id }} })"
-                                class="bg-blue-500 text-white px-3 py-1 rounded">
+                                class="bg-blue-600 hover:bg-blue-800 text-white px-3 py-1 rounded" title="Editar">
                                 <i class="fas fa-edit"></i>
+                            </button>
+
+                            <button wire:click="dispatch('verusuario', { id: {{ $user->id }} })"
+                                class="bg-yellow-600 hover:bg-yellow-800 text-white px-3 py-1 rounded" title="Ver historial">
+                                <i class="fas fa-eye"></i>
                             </button>
 
                             <!-- Botón Eliminar -->
@@ -96,6 +101,7 @@
 
     {{-- Incluir el modal --}}
     @livewire('users.user-form')
+    @livewire('users.user-show')
 
     {{-- Script para confirmar eliminación --}}
     <script>

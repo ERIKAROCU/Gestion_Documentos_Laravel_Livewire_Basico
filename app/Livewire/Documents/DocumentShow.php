@@ -13,7 +13,7 @@ class DocumentShow extends Component
 
     public $modalVisible = false;
 
-    protected $listeners = ['viewDocument' => 'loadDocument', 'showDocumentShowModal' => 'showModal', 'refreshTable' => '$refresh'];
+    protected $listeners = ['viewDocument' => 'loadDocument', 'verusuario' => 'showModal', 'refreshTable' => '$refresh'];
 
     public function loadDocument($id)
     {

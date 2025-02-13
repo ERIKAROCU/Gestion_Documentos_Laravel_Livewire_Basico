@@ -28,17 +28,22 @@
                     </div>
 
                     <!-- Contenido de las Pestañas -->
+                    @if(Auth::check() && Auth::user()->role === 'admin')
                     <div x-show="tab === 'documents'" class="mt-6">
                         @include('partials._documents')
                     </div>
+                    @endif
 
+                    @if(Auth::check() && Auth::user()->role === 'admin')
                     <div x-show="tab === 'users'" class="mt-6">
                         @include('partials._users')
                     </div>
+                    @endif
 
                     <div x-show="tab === 'myactivity'" class="mt-6">
                         @include('partials._myactivity')
                     </div>
+                </div>
             </div>
         </div>
     </div>
@@ -47,6 +52,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Gráficos para Documentos
+        @if(Auth::check() && Auth::user()->role === 'admin')
         const lineChartDocuments = new Chart(document.getElementById('lineChartDocuments'), {
             type: 'line',
             data: {
@@ -61,27 +67,25 @@
             }
         });
 
+        // Datos dinámicos desde PHP
+        const estados = @json($documentosPorEstado['estados']);
+        const cantidades = @json($documentosPorEstado['cantidades']);
+        const colores = @json($documentosPorEstado['colores']);
+
         const barChartDocuments = new Chart(document.getElementById('barChartDocuments'), {
             type: 'bar',
             data: {
-                labels: {!! json_encode($documentosPorEstado['estados']) !!},
+                labels: estados,
                 datasets: [{
                     label: 'Documentos por Estado',
-                    data: {!! json_encode($documentosPorEstado['cantidades']) !!},
-                    backgroundColor: [
-                        'rgba(239, 68, 68, 0.6)', // Rojo
-                        'rgba(34, 197, 94, 0.6)', // Verde
-                        'rgba(59, 130, 246, 0.6)', // Azul
-                    ],
-                    borderColor: [
-                        'rgba(239, 68, 68, 0.6)', // Rojo
-                        'rgba(34, 197, 94, 0.6)', // Verde
-                        'rgba(59, 130, 246, 0.6)', // Azul
-                    ],
+                    data: cantidades,
+                    backgroundColor: colores,
+                    borderColor: colores,
                     borderWidth: 1
                 }]
             }
         });
+        
 
         const pieChartDocuments = new Chart(document.getElementById('pieChartDocuments'), {
             type: 'pie',
@@ -118,8 +122,10 @@
                 }]
             }
         });
+        @endif
 
         // Gráficos para Usuarios
+        @if(Auth::check() && Auth::user()->role === 'admin')
         const barChartUsersByRole = new Chart(document.getElementById('barChartUsersByRole'), {
             type: 'bar',
             data: {
@@ -164,8 +170,8 @@
                     label: 'Usuarios',
                     data: [{{ $usuariosActivos }}, {{ $usuariosInactivos }}],
                     backgroundColor: [
-                        'rgba(59, 130, 246, 0.6)', // Azul
-                        'rgba(239, 68, 68, 0.6)', // Rojo
+                        'blue', // Azul
+                        'red', // Rojo
                     ],
                     borderColor: [
                         'rgba(59, 130, 246, 1)',
@@ -189,6 +195,41 @@
                 }]
             }
         });
+        @endif
+
+        // Gráfico de Líneas - Documentos Registrados por Día (Usuario)
+        const lineChartUserDocuments = new Chart(document.getElementById('lineChartUserDocuments'), {
+            type: 'line',
+            data: {
+                labels: {!! json_encode($documentosUsuarioPorDia['fechas']) !!},
+                datasets: [{
+                    label: 'Documentos Registrados',
+                    data: {!! json_encode($documentosUsuarioPorDia['cantidades']) !!},
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            }
+        });
+
+        // Datos dinámicos desde PHP
+        const estados_2 = @json($documentosUsuarioPorEstadoGraficos['estados']);
+        const cantidades_2 = @json($documentosUsuarioPorEstadoGraficos['cantidades']);
+        const colores_2 = @json($documentosUsuarioPorEstadoGraficos['colores']);
+
+        // Gráfico de Barras - Documentos por Estado (Usuario)
+        const barChartUserDocuments = new Chart(document.getElementById('barChartUserDocuments'), {
+            type: 'bar',
+            data: {
+                labels: estados_2,
+                datasets: [{
+                    label: 'Documentos por Estado',
+                    data: cantidades_2,
+                    backgroundColor: colores_2,
+                    borderColor: colores_2,
+                    borderWidth: 1
+                }]
+            }
+        });
     </script>
-    </div>
 </x-app-layout>

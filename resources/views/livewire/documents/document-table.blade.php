@@ -63,7 +63,7 @@
 
         <!-- Búsqueda general -->
         <div class="lg:col-span-2">
-            <input
+            <input 
                 type="text"
                 wire:model.live="search"
                 placeholder="Buscar por número documento, título..."
@@ -193,36 +193,38 @@
                                 </div>
                             @endif
                         </td>
-                        <td class="py-2 px-4 border-b text-sm">
+                        <td class="border border-gray-300 p-2 text-center">
                             <!-- Descargar archivo -->
                             @if ($document->files->isNotEmpty())
-                                <a href="{{ route('files.download', $document->files->first()->id) }}" class="text-blue-500 hover:text-blue-700 text-sm">
-                                    <i class="fas fa-download"></i>
+                                <a href="{{ route('files.download', $document->files->first()->id) }}" 
+                                    class="bg-gray-600 hover:bg-gray-800 text-white px-2 py-1 rounded" title="Descargar">
+                                    <i class="fas fa-download text-sm"></i>
                                 </a>                        
                             @else
                                 <span class="text-red-500">
-                                    <i class="fas fa-file-circle-xmark"></i> Sin archivo
+                                    <p title="No hay archivo disponible"><i class="fas fa-ban text-sm text-gray-500"></i></p>
                                 </span>
                             @endif
                         
                             <!-- Editar documento -->
                             <button wire:click="dispatch('edit', { id: {{ $document->id }} })"
-                                class="bg-blue-500 text-white px-3 py-1 rounded">
-                                <i class="fa fa-edit"></i>
+                                class="bg-blue-600 hover:bg-blue-800 text-white px-2 py-1 rounded" title="Editar">
+                                <i class="fa fa-edit text-sm"></i>
                             </button>
                         
                             <!-- Emitir documento -->
                             <button wire:click="dispatch('emitDocument', { id: {{ $document->id }} })"
-                                class="bg-green-600 text-white px-3 py-1 rounded">
-                                <i class="fas fa-paper-plane"></i>
+                                class="bg-green-600 hover:bg-green-800 text-white px-2 py-1 rounded" title="Emitir">
+                                <i class="fas fa-paper-plane text-sm"></i>
                             </button>
                         
                             {{-- Ver documento --}}
                             <button wire:click="dispatch('viewDocument', { id: {{ $document->id }} })"
-                                class="bg-yellow-600 text-white px-3 py-1 rounded">
-                                <i class="fas fa-eye"></i>
+                                class="bg-yellow-600 hover:bg-yellow-800 text-white px-2 py-1 rounded" title="Ver detalles">
+                                <i class="fas fa-eye text-sm"></i>
                             </button>
                         </td>
+                        
                         
                     </tr>
                 @empty
