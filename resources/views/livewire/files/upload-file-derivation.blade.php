@@ -59,7 +59,7 @@
                                 type="file"
                                 wire:model="archivo"
                                 id="archivo"
-                                accept="pdf,docs y mas"
+                                accept=".pdf,.doc,.docx,.xlsx"
                                 class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2"
                             >
                             @error('archivo') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
@@ -86,3 +86,13 @@
         </style>
     @endif
 </div>
+<script>
+    window.addEventListener('swal', event => {
+        Swal.fire({
+            title: event.detail.title,
+            icon: event.detail.icon,
+            showConfirmButton: true,
+            timer: 1000
+        });
+    });
+</script>

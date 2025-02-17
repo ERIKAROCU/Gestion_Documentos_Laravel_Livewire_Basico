@@ -16,6 +16,7 @@ class UploadFileDerivation extends Component
 
     public $documento_id, $archivo, $derivado_oficina, $fecha_salida, $titulo;
     public $oficinas = [];
+    public $archivoExistente;
     public $modalVisible = false;
 
     public $isEditing;
@@ -38,7 +39,7 @@ class UploadFileDerivation extends Component
         'titulo.required' => 'El título es obligatorio.',
     ];
 
-    protected $listeners = ['emitDocument' => 'loadDocument', 'showUploadFileDerivationModal' => 'showModal', 'refreshTable' => '$refresh'];
+    protected $listeners = ['emitDocument' => 'loadDocument', 'showUploadFileDerivationModal' => 'showModal', 'refreshTable' => '$refresh', 'swal' => 'swal'];
 
     public function loadDocument($id)
     {
@@ -160,10 +161,13 @@ class UploadFileDerivation extends Component
                 'nombre_original' => $this->archivo->getClientOriginalName(),
             ]
         );
+        $message = $this->documento_id ? 'Archivo actualizado.' : 'Archivo derivado.';
+        session()->flash('message', $message);
+        $this->dispatch('swal', title: $message, icon: 'success');
 
-        session()->flash('message', 'Archivo subido y documento derivado correctamente.');
         $this->reset();
-        return redirect()->route('documents.index');
+        $this->modalVisible = false;
+        $this->dispatch('refreshTable');
     }
 
     public function render()

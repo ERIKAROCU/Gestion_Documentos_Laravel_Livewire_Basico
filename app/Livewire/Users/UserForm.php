@@ -48,7 +48,7 @@ class UserForm extends Component
         'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
     ];
 
-    protected $listeners = ['edit' => 'loadUser', 'showModal' => 'showModal', 'refreshTable' => '$refresh'];
+    protected $listeners = ['edit' => 'loadUser', 'showModal' => 'showModal', 'refreshTable' => '$refresh', 'swal' => 'swal'];
 
     public function loadUser($id)
     {
@@ -96,8 +96,12 @@ class UserForm extends Component
         }
 
         User::updateOrCreate(['id' => $this->user_id], $data);
+
+        $message = $this->user_id ? 'Usuario actualizado.' : 'Usuario creado.';
         
-        session()->flash('message', $this->user_id ? 'Usuario actualizado.' : 'Usuario creado.');
+        session()->flash('message', $message);
+
+        $this->dispatch('swal', title: $message, icon: 'success');
         
         $this->modalVisible = false;
         $this->isEditing = true;

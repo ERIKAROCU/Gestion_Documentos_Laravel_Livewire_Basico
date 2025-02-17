@@ -5,6 +5,7 @@ namespace App\Livewire\Oficinas;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Oficina;
+use Illuminate\Support\Facades\Auth;
 
 class OficinaTable extends Component
 {
@@ -32,6 +33,10 @@ class OficinaTable extends Component
 
     public function render()
     {
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para ver esta página.');
+        }
+        
         $oficinas = Oficina::query()
             ->when($this->search, function ($query) {
                 $query->where('nombre_oficina', 'like', '%' . $this->search . '%');

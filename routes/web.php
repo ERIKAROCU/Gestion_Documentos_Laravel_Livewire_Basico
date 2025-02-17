@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Livewire\Actions\Logout;
 
 
 Route::view('/', 'welcome');
@@ -14,10 +15,10 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
-Route::post('/logout', function () {
-    Auth::logout();
-    return redirect('/');
-})->name('logout');
+Route::middleware('web')->group(function () {
+    Route::get('/', fn () => view('welcome'))->name('home');
+    Route::post('/logout', Logout::class)->name('logout');
+});
 
 use App\Http\Controllers\DashboardController;
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');

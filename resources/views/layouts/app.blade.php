@@ -16,6 +16,8 @@
         <script src="https://unpkg.com/lucide@latest"></script>
         <script src="//unpkg.com/alpinejs" defer></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])

@@ -5,10 +5,12 @@ namespace App\Livewire\Users;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class UserTable extends Component
 {
     use WithPagination;
+
 
     public $search = ''; // Búsqueda general
     public $perPage = 10; // Número de usuarios por página
@@ -27,6 +29,9 @@ class UserTable extends Component
     }
     public function render()
     {
+        if (Auth::user()->role !== 'admin') {
+            abort(403, 'No tienes permisos para ver esta página.');
+        }
         $users = User::query()
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')

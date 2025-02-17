@@ -30,6 +30,15 @@ class LoginForm extends Form
     {
         $this->ensureIsNotRateLimited();
 
+        $user = \App\Models\User::where('email', $this->email)->first();
+
+        // Verificar si el usuario existe y está activo
+        if (!$user || !$user->is_active) {
+            throw ValidationException::withMessages([
+                'form.email' => 'Tu cuenta está inactiva. Contacta al administrador.',
+            ]);
+        }
+
         if (! Auth::attempt($this->only(['email', 'password']), $this->remember)) {
             RateLimiter::hit($this->throttleKey());
 

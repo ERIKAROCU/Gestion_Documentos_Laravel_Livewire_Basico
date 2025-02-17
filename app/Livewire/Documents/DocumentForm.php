@@ -53,7 +53,7 @@ class DocumentForm extends Component
         }
     }
 
-    protected $listeners = ['edit' => 'loadDocument', 'showDocumentFormModal' => 'showModal', 'refreshTable' => '$refresh'];
+    protected $listeners = ['edit' => 'loadDocument', 'showDocumentFormModal' => 'showModal', 'refreshTable' => 'loadDocuments', 'swal' => 'swal'];
 
     public function loadDocument($id)
     {
@@ -115,10 +115,16 @@ class DocumentForm extends Component
             )
         );
 
-        session()->flash('message', $this->documentId ? 'Documento actualizado correctamente.' : 'Documento registrado correctamente.');
+        $message = $this->documentId ? 'Documento actualizado.' : 'Documento registrado.';
+        
+        session()->flash('message', $message);
+
+        $this->dispatch('swal', title: $message, icon: 'success');
+
+        $this->modalVisible = false;
+        $this->dispatch('refreshTable');
+
         $this->reset();
-        $this->closeModal();
-        return redirect()->route('documents.index');
     }
 
     public function render()

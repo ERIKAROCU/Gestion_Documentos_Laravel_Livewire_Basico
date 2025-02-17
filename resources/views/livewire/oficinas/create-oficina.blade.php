@@ -30,3 +30,13 @@
         </style>
     @endif
 </div>
+<script>
+    window.addEventListener('swal', event => {
+        Swal.fire({
+            title: event.detail.title,
+            icon: event.detail.icon,
+            showConfirmButton: true,
+            timer: 1000
+        });
+    });
+</script>

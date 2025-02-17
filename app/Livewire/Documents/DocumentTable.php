@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Models\Document;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Oficina;
+use App\Models\User;
 
 class DocumentTable extends Component
 {
@@ -24,6 +25,8 @@ class DocumentTable extends Component
     public $documentoId; // ID del documento a emitir
     public $document;
     public $oficinas = [];
+
+    protected $listeners = ['refreshTable' => '$refresh',];
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -66,30 +69,36 @@ class DocumentTable extends Component
     }
 
     public function render()
-{
-    $this->actualizarEstados(); // Actualizar estados antes de renderizar
-
-    $documents = Document::query()
-        ->when($this->search, function ($query) {
-            $query->where(function ($subquery) {
-                $subquery->where('numero_documento', 'like', '%' . $this->search . '%')
-                         ->orWhere('titulo', 'like', '%' . $this->search . '%')
-                         ->orWhere('fecha_ingreso', 'like', '%' . $this->search . '%')
-                         ->orWhere('fecha_salida', 'like', '%' . $this->search . '%')
-                         ->orWhere('origen_oficina', 'like', '%' . $this->search . '%')
-                         ->orWhere('derivado_oficina', 'like', '%' . $this->search . '%')
-                         ->orWhere('estado', 'like', '%' . $this->search . '%');
-            });
-        })
-        ->when($this->searchDate, fn($query) => $query->whereDate('fecha_ingreso', $this->searchDate))
-        ->when($this->searchOrigenOficina, fn($query) => $query->where('origen_oficina', $this->searchOrigenOficina))
-        ->when($this->searchDerivadoOficina, fn($query) => $query->where('derivado_oficina', $this->searchDerivadoOficina))
-        ->when($this->searchEstado, fn($query) => $query->where('estado', $this->searchEstado))
-        ->orderBy('numero_documento', 'desc')
-        ->paginate($this->perPage);
-
-    return view('livewire.documents.document-table', [
-        'documents' => $documents,
-    ])->layout('layouts.app');
-}
+    {
+        $this->actualizarEstados(); // Actualizar estados antes de renderizar
+    
+        $user = Auth::user();
+    
+        $documents = Document::query()
+            ->when(!$user->isAdmin(), function ($query) use ($user) {
+                // Filtra solo los documentos del usuario autenticado si no es admin
+                $query->where('trabajador_id', $user->id);
+            })
+            ->when($this->search, function ($query) {
+                $query->where(function ($subquery) {
+                    $subquery->where('numero_documento', 'like', '%' . $this->search . '%')
+                             ->orWhere('titulo', 'like', '%' . $this->search . '%')
+                             ->orWhere('fecha_ingreso', 'like', '%' . $this->search . '%')
+                             ->orWhere('fecha_salida', 'like', '%' . $this->search . '%')
+                             ->orWhere('origen_oficina', 'like', '%' . $this->search . '%')
+                             ->orWhere('derivado_oficina', 'like', '%' . $this->search . '%')
+                             ->orWhere('estado', 'like', '%' . $this->search . '%');
+                });
+            })
+            ->when($this->searchDate, fn($query) => $query->whereDate('fecha_ingreso', $this->searchDate))
+            ->when($this->searchOrigenOficina, fn($query) => $query->where('origen_oficina', $this->searchOrigenOficina))
+            ->when($this->searchDerivadoOficina, fn($query) => $query->where('derivado_oficina', $this->searchDerivadoOficina))
+            ->when($this->searchEstado, fn($query) => $query->where('estado', $this->searchEstado))
+            ->orderBy('numero_documento', 'desc')
+            ->paginate($this->perPage);
+    
+        return view('livewire.documents.document-table', [
+            'documents' => $documents,
+        ])->layout('layouts.app');
+    }
 }

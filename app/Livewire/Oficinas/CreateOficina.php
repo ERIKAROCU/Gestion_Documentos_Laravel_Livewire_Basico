@@ -21,7 +21,7 @@ class CreateOficina extends Component
         'nombre_oficina.max' => 'El nombre de la oficina no puede tener más de 255 caracteres.',
     ];
 
-    protected $listeners = ['edit' => 'loadOficina', 'showModal' => 'showModal', 'refreshTable' => '$refresh'];
+    protected $listeners = ['edit' => 'loadOficina', 'showModal' => 'showModal', 'refreshTable' => '$refresh', 'swal' => 'swal'];
 
     public function loadOficina($id)
     {
@@ -53,7 +53,11 @@ class CreateOficina extends Component
             ['nombre_oficina' => $this->nombre_oficina]
         );
 
-        session()->flash('message', $this->oficina_id ? 'Oficina actualizada.' : 'Oficina creada.');
+        $message = $this->oficina_id ? 'Oficina actualizada.' : 'Oficina creada.';
+        
+        session()->flash('message', $message);
+
+        $this->dispatch('swal', title: $message, icon: 'success');
 
         $this->modalVisible = false;
         $this->dispatch('refreshTable');
